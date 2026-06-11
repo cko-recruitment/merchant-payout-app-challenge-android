@@ -1,0 +1,21 @@
+{
+  "items": [
+    { "id": "act_001", "type": "deposit",  "amount":  150000, "currency": "GBP", "date": "2026-05-18T10:23:00.000Z", "description": "Payment from Customer ABC",              "status": "completed" },
+    { "id": "act_002", "type": "payout",   "amount":  -50000, "currency": "GBP", "date": "2026-05-17T14:30:00.000Z", "description": "Payout to Bank Account ****1234",       "status": "completed" },
+    { "id": "act_003", "type": "deposit",  "amount":  230000, "currency": "GBP", "date": "2026-05-16T09:15:00.000Z", "description": "Payment from Customer XYZ",              "status": "completed" },
+    { "id": "act_004", "type": "fee",      "amount":   -2500, "currency": "GBP", "date": "2026-05-15T08:00:00.000Z", "description": "Monthly service fee",                   "status": "completed" },
+    { "id": "act_005", "type": "payout",   "amount": -120000, "currency": "GBP", "date": "2026-05-14T16:45:00.000Z", "description": "Payout to Bank Account ****5678",       "status": "completed" },
+    { "id": "act_006", "type": "deposit",  "amount":   80000, "currency": "GBP", "date": "2026-05-13T11:20:00.000Z", "description": "Payment from Customer DEF",              "status": "completed" },
+    { "id": "act_007", "type": "refund",   "amount":  -15000, "currency": "GBP", "date": "2026-05-12T13:10:00.000Z", "description": "Refund to Customer GHI",                "status": "completed" },
+    { "id": "act_008", "type": "deposit",  "amount":  320000, "currency": "GBP", "date": "2026-05-11T09:30:00.000Z", "description": "Payment from Customer JKL",              "status": "completed" },
+    { "id": "act_009", "type": "payout",   "amount":  -75000, "currency": "GBP", "date": "2026-05-10T17:00:00.000Z", "description": "Payout to Bank Account ****9012",       "status": "completed" },
+    { "id": "act_010", "type": "deposit",  "amount":   95000, "currency": "GBP", "date": "2026-05-09T10:45:00.000Z", "description": "Payment from Customer MNO",              "status": "completed" },
+    { "id": "act_011", "type": "fee",      "amount":   -1500, "currency": "GBP", "date": "2026-05-08T08:00:00.000Z", "description": "Transaction fee",                       "status": "completed" },
+    { "id": "act_012", "type": "payout",   "amount":  -30000, "currency": "GBP", "date": "2026-05-07T15:20:00.000Z", "description": "Payout to Bank Account ****3456",       "status": "completed" },
+    { "id": "act_013", "type": "deposit",  "amount":  180000, "currency": "GBP", "date": "2026-05-06T12:00:00.000Z", "description": "Payment from Customer PQR",              "status": "completed" },
+    { "id": "act_014", "type": "deposit",  "amount":  110000, "currency": "GBP", "date": "2026-05-05T09:30:00.000Z", "description": "Payment from Customer STU",              "status": "completed" },
+    { "id": "act_015", "type": "payout",   "amount":  -60000, "currency": "GBP", "date": "2026-05-04T14:15:00.000Z", "description": "Payout to Bank Account ****7890",       "status": "completed" }
+  ],
+  "next_cursor": "act_015",
+  "has_more": true
+}

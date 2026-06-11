@@ -1,0 +1,34 @@
+{
+  "available_balance": 500000,
+  "pending_balance": 25000,
+  "currency": "GBP",
+  "activity": [
+    {
+      "id": "act_001",
+      "type": "deposit",
+      "amount": 150000,
+      "currency": "GBP",
+      "date": "2026-05-18T10:23:00.000Z",
+      "description": "Payment from Customer ABC",
+      "status": "completed"
+    },
+    {
+      "id": "act_002",
+      "type": "payout",
+      "amount": -50000,
+      "currency": "GBP",
+      "date": "2026-05-17T14:30:00.000Z",
+      "description": "Payout to Bank Account ****1234",
+      "status": "completed"
+    },
+    {
+      "id": "act_003",
+      "type": "deposit",
+      "amount": 230000,
+      "currency": "GBP",
+      "date": "2026-05-16T09:15:00.000Z",
+      "description": "Payment from Customer XYZ",
+      "status": "completed"
+    }
+  ]
+}
