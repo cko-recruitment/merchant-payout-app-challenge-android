@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common actions -->
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="try_again">Try Again</string>
+    <string name="cd_back">Back</string>
+    <string name="loading_more">Loading more…</string>
+
+    <!-- Home screen -->
+    <string name="home_title">Business Account</string>
+    <string name="home_account_balance">Account Balance</string>
+    <string name="home_balance_available">Available</string>
+    <string name="home_balance_pending">Pending</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="home_show_more">Show more</string>
+
+    <!-- Error messages -->
+    <string name="error_something_went_wrong">Something went wrong</string>
+    <string name="error_unknown">Unknown error</string>
+    <string name="error_biometric_not_enrolled">Please set up biometrics in your device settings to authorise this payment.</string>
+    <string name="error_payout_title">Unable to Process Payout</string>
+    <string name="error_insufficient_funds">Insufficient funds.</string>
+    <string name="error_service_unavailable">Service temporarily unavailable. Please try again later.</string>
+
+    <!-- Date group labels -->
+    <string name="date_today">Today</string>
+    <string name="date_yesterday">Yesterday</string>
+
+    <!-- Activity type labels -->
+    <string name="activity_type_payout">Payout</string>
+    <string name="activity_type_deposit">Deposit</string>
+    <string name="activity_type_refund">Refund</string>
+    <string name="activity_type_fee">Fee</string>
+
+    <!-- Activity status labels -->
+    <string name="activity_status_completed">Completed</string>
+    <string name="activity_status_pending">Pending</string>
+    <string name="activity_status_processing">Processing</string>
+    <string name="activity_status_failed">Failed</string>
+
+    <!-- Payout screen -->
+    <string name="payout_title">Send Payout</string>
+    <string name="payout_field_amount">Amount</string>
+    <string name="payout_field_currency">Currency</string>
+    <string name="payout_field_iban">IBAN</string>
+    <string name="payout_iban_hint">Enter the destination bank account IBAN</string>
+    <string name="payout_confirm_dialog_title">Confirm Payout</string>
+    <string name="payout_biometric_subtitle">Verify your identity to send %1$s</string>
+    <string name="payout_success_title">Payout Completed</string>
+    <string name="payout_success_message">Your payout of %1$s has been processed successfully.</string>
+    <string name="payout_create_another">Create Another Payout</string>
+    <string name="payout_edit">Edit Payout</string>
+</resources>

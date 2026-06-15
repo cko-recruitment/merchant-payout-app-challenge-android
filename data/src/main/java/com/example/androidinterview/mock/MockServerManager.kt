@@ -12,12 +12,16 @@ object MockServerManager {
 
     private val server = MockWebServer()
 
+    @Volatile
+    private var _baseUrl: String = ""
+
     val baseUrl: String
-        get() = server.url("/").toString()
+        get() = _baseUrl
 
     fun start() {
         server.dispatcher = MockDispatcher()
         server.start()
+        _baseUrl = server.url("/").toString()
     }
 
     fun shutdown() {

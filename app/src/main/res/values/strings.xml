@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">AndroidInterview</string>
+
+    <!-- Navigation tabs -->
+    <string name="tab_home">Home</string>
+    <string name="tab_payout">Payout</string>
+
+    <!-- Screenshot warning dialog -->
+    <string name="screenshot_warning_title">Security Reminder</string>
+    <string name="screenshot_warning_message">Please keep your financial data private. Screenshots may contain sensitive information.</string>
+    <string name="ok">OK</string>
 </resources>
