@@ -66,5 +66,8 @@
     <string name="payout_biometric_subtitle">Authenticate to complete the payout</string>
     <string name="payout_error_biometric_cancelled">Biometric authentication was cancelled.</string>
     <string name="payout_error_biometric_unavailable">Biometric authentication isn\'t available. Check it\'s set up in your device settings, then try again.</string>
+    <string name="payout_security_reminder_title">Security Reminder</string>
+    <string name="payout_security_reminder_message">Please keep your financial data private. Screenshots may contain sensitive information.</string>
+    <string name="payout_security_reminder_ok">OK</string>
     <string name="payout_error_unexpected">Something went wrong. Please try again.</string>
 </resources>

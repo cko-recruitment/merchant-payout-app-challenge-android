@@ -14,6 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,9 +27,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidinterview.R
 import com.example.androidinterview.core.biometric.rememberBiometricAuthenticator
+import com.example.androidinterview.core.security.ScreenshotDetectedEffect
+import com.example.androidinterview.core.security.SecureScreenEffect
 import manoellribeiro.dev.design_system.components.button.PrimaryActionButton
 import manoellribeiro.dev.design_system.components.dialog.PayoutConfirmationDialog
 import manoellribeiro.dev.design_system.components.dialog.PayoutSummaryLine
+import manoellribeiro.dev.design_system.components.dialog.SecurityReminderDialog
 import manoellribeiro.dev.design_system.components.formField.LabeledDropdownField
 import manoellribeiro.dev.design_system.components.formField.LabeledTextField
 import manoellribeiro.dev.design_system.components.header.ScreenTitle
@@ -50,6 +56,9 @@ fun PayoutDestination(
     viewModel: PayoutViewModel = viewModel(factory = viewModelFactory),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var isSecurityReminderVisible by rememberSaveable { mutableStateOf(false) }
+    SecureScreenEffect()
+    ScreenshotDetectedEffect(onScreenshotDetected = { isSecurityReminderVisible = true })
     val authenticator = rememberBiometricAuthenticator(viewModel::onBiometricResult)
     val biometricTitle = stringResource(R.string.payout_biometric_title)
     val biometricSubtitle = stringResource(R.string.payout_biometric_subtitle)
@@ -77,6 +86,14 @@ fun PayoutDestination(
         onStartAgain = viewModel::onStartAgain,
         modifier = modifier,
     )
+    if (isSecurityReminderVisible) {
+        SecurityReminderDialog(
+            title = stringResource(R.string.payout_security_reminder_title),
+            message = stringResource(R.string.payout_security_reminder_message),
+            acknowledgeLabel = stringResource(R.string.payout_security_reminder_ok),
+            onAcknowledgeClick = { isSecurityReminderVisible = false },
+        )
+    }
 }
 
 @Composable
