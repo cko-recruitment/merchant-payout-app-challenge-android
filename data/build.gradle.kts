@@ -18,7 +18,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
+    buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
+    }
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
+    }
 }
 
 dependencies {
@@ -35,5 +42,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.kotlinx.serialization)
 
-    testImplementation(libs.junit)
+    testImplementation(testFixtures(project(":domain")))
+    testImplementation(libs.mockk)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }

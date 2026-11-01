@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    id("jacoco")
 }
 
 android {
@@ -24,6 +25,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -38,6 +42,9 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    testOptions {
+        unitTests.all { it.useJUnitPlatform() }
     }
 
     composeCompiler {
@@ -102,7 +109,10 @@ dependencies {
     implementation(libs.androidx.appcompat)
 
     // Testing
-    testImplementation(libs.junit)
+    testImplementation(testFixtures(project(":domain")))
+    testImplementation(libs.mockk)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,4 +120,43 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+tasks.register<JacocoReport>("jacocoUnitTestReport") {
+    group = "verification"
+    description = "Generates the unit test coverage report of :app, :data and :domain, limited to the classes we unit test."
+    dependsOn(":app:testDebugUnitTest", ":data:testDebugUnitTest", ":domain:test")
+
+    reports {
+        html.required = true
+        xml.required = true
+    }
+
+    // Only these classes count for coverage; everything else (composables, activities, ui state classes, models...) is left out
+    val coveredClasses = listOf(
+        "**/screens/**/*ViewModel.class",
+        "**/screens/**/*ViewModel\$*.class",
+        "**/screens/**/*UiStateKt*.class",
+        "**/core/formatting/**",
+        "**/data/repository/**",
+        "**/data/service/**",
+        "**/data/remote/ApiCallKt*.class",
+        "**/data/remote/model/*Kt*.class",
+        "**/data/remote/model/IsoInstantSerializer*.class",
+        "**/domain/usecase/**",
+        "**/domain/model/MoneyConverter*.class",
+    )
+
+    classDirectories.setFrom(
+        files(
+            fileTree(layout.buildDirectory.dir("intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")),
+            fileTree(rootProject.layout.projectDirectory.dir("data/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")),
+            fileTree(rootProject.layout.projectDirectory.dir("domain/build/classes/kotlin/main")),
+        ).asFileTree.matching { include(coveredClasses) }
+    )
+    sourceDirectories.setFrom(files("src/main/java", "../data/src/main/java", "../domain/src/main/java"))
+    executionData.setFrom(
+        fileTree(layout.buildDirectory) { include("outputs/unit_test_code_coverage/debugUnitTest/*.exec") },
+        fileTree(rootProject.layout.projectDirectory.dir("data/build")) { include("outputs/unit_test_code_coverage/debugUnitTest/*.exec") },
+        fileTree(rootProject.layout.projectDirectory.dir("domain/build/jacoco")) { include("*.exec") },
+    )
 }
