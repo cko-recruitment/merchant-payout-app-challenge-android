@@ -127,6 +127,11 @@ class PayoutViewModel(
             return
         }
         val form = _uiState.value as? PayoutUiState.Form ?: return
+        // The connection can drop while the prompt is open. Nothing was sent, so the form says why.
+        if (!form.isOnline) {
+            emitForm(form.copy(confirmation = null))
+            return
+        }
         val amount = parsePayoutAmount(form.amount, form.currency) ?: return
         sendPayout(amount, form.iban)
     }
