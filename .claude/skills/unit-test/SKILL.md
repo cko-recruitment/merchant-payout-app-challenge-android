@@ -27,7 +27,7 @@ class HomeViewModelTest {}
 ### 2.1 `setup()` method (@BeforeEach)
 - Always use `@BeforeEach` to configure the test environment
 - Initialize mocks and dependencies, the mock behaviors should be created inside each unit test method never in the `setup` method (the only exception is described below).
-- Always create the class under test in `setup`, never inside a test method or a helper.
+- Always create the class under test in `setup`, never inside a test method or a helper. The only exception is a plain data class under test whose constructor receives the fake values (e.g. `PayoutRequest`, `Payout`): declare the fake data at the start of the test and create the instance right after it, inside the test method.
 - Whenever the class under test needs a `CoroutineDispatcher`, pass `UnconfinedTestDispatcher()` as a constructor parameter
 - The only mock behavior allowed in `setup` is the one the class under test needs to be constructed: if it calls a dependency in its constructor or property initializers (e.g. `PayoutViewModel` calls `isPayoutFormComplete` to build its initial `uiState`), a strict mock throws unless that call is configured before the constructor runs. Configure only that call, right before creating the class, and make it return something each test can control (see 2.2). Everything else stays in the test methods.
 
@@ -513,7 +513,7 @@ Before finalizing a test, verify:
 - [ ] The class has `@OptIn(ExperimentalCoroutinesApi::class)` if it uses experimental coroutine test APIs
 - [ ] There is no dependency injection context in the tests
 - [ ] Mocks are `lateinit var`s created with strict `mockk()` in `@BeforeEach`, with no `relaxed = true`
-- [ ] The class under test is created in `setup()`, never inside a test method
+- [ ] The class under test is created in `setup()`, never inside a test method (except a plain data class that receives the fake values in its constructor)
 - [ ] `SavedStateHandle` is real and created anew in `setup()`, never shared between tests
 - [ ] ViewModel tests mock every use case, even the ones with no dependencies
 - [ ] Failures are configured as `Result.failure(...)` when the dependency returns `Result`
