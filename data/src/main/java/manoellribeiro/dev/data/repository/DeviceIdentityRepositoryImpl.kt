@@ -1,7 +1,6 @@
 package manoellribeiro.dev.data.repository
 
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import java.io.IOException
 import java.security.GeneralSecurityException
 import java.util.UUID
@@ -29,13 +28,18 @@ internal class DeviceIdentityRepositoryImpl(
             Result.failure(DataError.Unexpected(e))
         } catch (e: IOException) {
             Result.failure(DataError.Unexpected(e))
+        } catch (e: SecurityException) {
+            // EncryptedSharedPreferences reports a value it can't decrypt or encrypt this way.
+            Result.failure(DataError.Unexpected(e))
         }
     }
 
     private fun readOrCreateDeviceId(): String =
         preferences.getString(KEY_DEVICE_ID, null)
             ?: UUID.randomUUID().toString().also { newId ->
-                preferences.edit(commit = true) { putString(KEY_DEVICE_ID, newId) }
+                // An ID that wasn't saved would change on the next call, so it can't count as a success.
+                val isSaved = preferences.edit().putString(KEY_DEVICE_ID, newId).commit()
+                if (!isSaved) throw IOException("Couldn't save the device ID")
             }
 
     private companion object {

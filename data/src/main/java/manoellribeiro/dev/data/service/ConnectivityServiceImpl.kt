@@ -24,9 +24,10 @@ internal class ConnectivityServiceImpl(
                 trySend(false)
             }
         }
-        // The callback stays silent when there's no network, so the starting value has to be read.
-        trySend(connectivityManager.activeNetwork != null)
         connectivityManager.registerDefaultNetworkCallback(callback)
+        // The callback stays silent when there's no network, so the starting value has to be read. It's read after
+        // registering, so a network lost in between still reaches the callback.
+        trySend(connectivityManager.activeNetwork != null)
         awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
     }.distinctUntilChanged()
 }

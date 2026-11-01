@@ -24,6 +24,9 @@ internal suspend fun <T> apiCall(call: suspend () -> T): Result<T> = try {
     Result.failure(DataError.Network(e))
 } catch (e: SerializationException) {
     Result.failure(DataError.Unexpected(e))
+} catch (e: NullPointerException) {
+    // Retrofit throws this when a successful response has no body.
+    Result.failure(DataError.Unexpected(e))
 }
 
 private fun HttpException.toDataError(): DataError {

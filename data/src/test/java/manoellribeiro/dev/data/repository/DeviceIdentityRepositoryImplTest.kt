@@ -197,4 +197,77 @@ class DeviceIdentityRepositoryImplTest {
         assertEquals(fakeDeviceId, fakeSecondResult.getOrNull())
         verify(exactly = 2) { preferencesProvider() }
     }
+
+    @Test
+    fun `if reading the stored id throws a SecurityException should return an Unexpected failure holding it`() = runTest {
+        // Given
+        val fakeException = SecurityException("fake value that could not be decrypted")
+        every { preferencesProvider() } returns preferences
+        every { preferences.getString("device_id", null) } throws fakeException
+
+        // When
+        val fakeResult = repository.getDeviceId()
+
+        // Then
+        val fakeError = fakeResult.exceptionOrNull()
+        assertInstanceOf(DataError.Unexpected::class.java, fakeError)
+        assertSame(fakeException, fakeError?.cause)
+        verify(exactly = 0) { preferences.edit() }
+    }
+
+    @Test
+    fun `if saving a new id throws a SecurityException should return an Unexpected failure holding it`() = runTest {
+        // Given
+        val fakeException = SecurityException("fake value that could not be encrypted")
+        every { preferencesProvider() } returns preferences
+        every { preferences.getString("device_id", null) } returns null
+        every { preferences.edit() } returns editor
+        every { editor.putString("device_id", any()) } throws fakeException
+
+        // When
+        val fakeResult = repository.getDeviceId()
+
+        // Then
+        val fakeError = fakeResult.exceptionOrNull()
+        assertInstanceOf(DataError.Unexpected::class.java, fakeError)
+        assertSame(fakeException, fakeError?.cause)
+        verify(exactly = 0) { editor.commit() }
+    }
+
+    @Test
+    fun `if commit returns false should return an Unexpected failure`() = runTest {
+        // Given
+        every { preferencesProvider() } returns preferences
+        every { preferences.getString("device_id", null) } returns null
+        every { preferences.edit() } returns editor
+        every { editor.putString("device_id", any()) } returns editor
+        every { editor.commit() } returns false
+
+        // When
+        val fakeResult = repository.getDeviceId()
+
+        // Then
+        assertInstanceOf(DataError.Unexpected::class.java, fakeResult.exceptionOrNull())
+        verify(exactly = 1) { editor.commit() }
+    }
+
+    @Test
+    fun `if commit failed and a later call commits should return a success with the saved id`() = runTest {
+        // Given
+        val fakeSavedIdSlot = slot<String>()
+        every { preferencesProvider() } returns preferences
+        every { preferences.getString("device_id", null) } returns null
+        every { preferences.edit() } returns editor
+        every { editor.putString("device_id", capture(fakeSavedIdSlot)) } returns editor
+        every { editor.commit() } returns false andThen true
+
+        // When
+        val fakeFirstResult = repository.getDeviceId()
+        val fakeSecondResult = repository.getDeviceId()
+
+        // Then
+        assertInstanceOf(DataError.Unexpected::class.java, fakeFirstResult.exceptionOrNull())
+        assertEquals(fakeSavedIdSlot.captured, fakeSecondResult.getOrNull())
+        verify(exactly = 2) { editor.commit() }
+    }
 }

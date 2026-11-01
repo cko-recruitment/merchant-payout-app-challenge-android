@@ -2,6 +2,7 @@ package manoellribeiro.dev.data.remote
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import java.io.IOException
 import java.net.SocketTimeoutException
 import kotlinx.coroutines.CancellationException
@@ -9,7 +10,11 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.SerializationException
 import manoellribeiro.dev.domain.error.DataError
 import manoellribeiro.dev.domain.testing.MainDispatcherExtension
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Response as OkHttpResponse
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,17 +28,29 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import retrofit2.HttpException
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.create
 
 @ExtendWith(MainDispatcherExtension::class)
 class ApiCallTest {
 
     private lateinit var retrofitResponse: Response<String>
     private lateinit var errorBody: ResponseBody
+    private lateinit var interceptor: Interceptor
+    private lateinit var merchantApi: MerchantApi
 
     @BeforeEach
     fun setup() {
         retrofitResponse = mockk()
         errorBody = mockk()
+        interceptor = mockk()
+        merchantApi = Retrofit.Builder()
+            .baseUrl("https://fake.example.com/")
+            .client(OkHttpClient.Builder().addInterceptor(interceptor).build())
+            .addConverterFactory(apiJson.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create<MerchantApi>()
     }
 
     @Test
@@ -318,6 +335,43 @@ class ApiCallTest {
         // Then
         assertSame(fakeException, fakeThrown)
     }
+
+    @Test
+    fun `if the call throws a NullPointerException should return an Unexpected failure holding it`() = runTest {
+        // Given
+        val fakeException = NullPointerException("fake missing body")
+
+        // When
+        val fakeResult = apiCall<String> { throw fakeException }
+
+        // Then
+        val fakeError = fakeResult.exceptionOrNull()
+        assertInstanceOf(DataError.Unexpected::class.java, fakeError)
+        assertSame(fakeException, fakeError?.cause)
+    }
+
+    @Test
+    fun `if retrofit receives a 204 with no body for a non null return type should return an Unexpected failure`() = runTest {
+        // Given
+        every { interceptor.intercept(any()) } answers { createFakeNoContentResponse(firstArg()) }
+
+        // When
+        val fakeResult = apiCall { merchantApi.getMerchant() }
+
+        // Then
+        val fakeError = fakeResult.exceptionOrNull()
+        assertInstanceOf(DataError.Unexpected::class.java, fakeError)
+        assertInstanceOf(KotlinNullPointerException::class.java, fakeError?.cause)
+        verify(exactly = 1) { interceptor.intercept(any()) }
+    }
+
+    private fun createFakeNoContentResponse(chain: Interceptor.Chain): OkHttpResponse = OkHttpResponse.Builder()
+        .request(chain.request())
+        .protocol(Protocol.HTTP_1_1)
+        .code(204)
+        .message("No Content")
+        .body("".toResponseBody())
+        .build()
 
     private fun createFakeHttpException(code: Int, body: String): HttpException = HttpException(
         Response.error<String>(code, body.toResponseBody("application/json".toMediaType())),

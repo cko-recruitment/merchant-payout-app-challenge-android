@@ -8,6 +8,7 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
@@ -187,6 +188,54 @@ class ConnectivityServiceImplTest {
 
         // Then
         verify(exactly = 1) { connectivityManager.unregisterNetworkCallback(fakeCallbackSlot.captured) }
+    }
+
+    @Test
+    fun `if the flow is collected should register the callback before reading the active network`() = runTest {
+        // Given
+        every { connectivityManager.activeNetwork } returns network
+        every { connectivityManager.registerDefaultNetworkCallback(any()) } just runs
+        every { connectivityManager.unregisterNetworkCallback(any<ConnectivityManager.NetworkCallback>()) } just runs
+
+        // When
+        collectIsOnline()
+        advanceUntilIdle()
+
+        // Then
+        verifyOrder {
+            connectivityManager.registerDefaultNetworkCallback(any())
+            connectivityManager.activeNetwork
+        }
+        verify(exactly = 1) { connectivityManager.registerDefaultNetworkCallback(any()) }
+        verify(exactly = 1) { connectivityManager.activeNetwork }
+    }
+
+    @Test
+    fun `if the network is lost right after the callback is registered should end with false`() = runTest {
+        // Given
+        // Acts like the platform when the network drops right after the first call: only a callback that is already
+        // registered hears about it, and a callback registered later stays silent because there is no network.
+        val fakeCallbackSlot = slot<ConnectivityManager.NetworkCallback>()
+        var fakeIsNetworkLost = false
+        every { connectivityManager.registerDefaultNetworkCallback(capture(fakeCallbackSlot)) } answers {
+            if (!fakeIsNetworkLost) {
+                fakeIsNetworkLost = true
+                fakeCallbackSlot.captured.onLost(network)
+            }
+        }
+        every { connectivityManager.activeNetwork } answers {
+            val fakeActiveNetwork = if (fakeIsNetworkLost) null else network
+            fakeIsNetworkLost = true
+            fakeActiveNetwork
+        }
+        every { connectivityManager.unregisterNetworkCallback(any<ConnectivityManager.NetworkCallback>()) } just runs
+
+        // When
+        val fakeStates = collectIsOnline()
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(listOf(false), fakeStates)
     }
 
     private fun TestScope.collectIsOnline(): List<Boolean> {
