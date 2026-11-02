@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
     id("jacoco")
 }
 
@@ -92,16 +91,6 @@ dependencies {
     // Networking
     implementation(libs.okhttp)
     implementation(libs.okhttp.mockwebserver)
-
-    // Room
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.paging)
-    ksp(libs.androidx.room.compiler)
-
-    // Paging
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
 
     // Biometric
     implementation(libs.androidx.biometric)
