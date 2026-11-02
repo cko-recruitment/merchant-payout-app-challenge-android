@@ -130,11 +130,17 @@ For more information, see the [guide to Android app modularization](https://deve
 
 - **Thresholds per currency from a remote source:** they could change without an app release, behind a `:domain` interface, so `ShouldRequestBiometricUseCase` doesn't change. They'd be fetched ahead of time and cached, so Confirm never waits on the network, with bundled defaults on first launch. If the fetch fails or a currency is missing, biometrics would be required.
 - **Supported currencies from a remote source:** `Currency` and `RemoteCurrency` are enums today, so adding a currency needs a release.
+- **Enable R8 in release:** `isMinifyEnabled` is `false` today, so the release build isn't shrunk, optimized or obfuscated, and there are no keep rules. Turning it on means adding any keep rules the app needs and testing the biometric and secure flows again on a release build.
+- **Performance tracing with Perfetto:** custom `androidx.tracing` sections around the Home load and the payout flow, and Macrobenchmark tests for startup and the transactions scroll, with the traces analysed in Perfetto. This would catch slowdowns as screens and features grow. It depends on R8 being enabled, because debug numbers aren't representative.
 
 **Observability**
 
 - **A small `PayoutTelemetry` interface with a Logcat implementation:** it would cover the payout funnel (form submitted, biometric required and its result, payout succeeded or failed by error type, offline shown), load errors and API latency. It would never log the IBAN or personal data, and would bucket amounts if it logged them at all.
 - **Mapping it to production:** Crashlytics non-fatals, Datadog or custom traces, alerts on payout success rate, and dashboards per currency and app version.
+
+**Testing**
+
+- **Integration tests:** instrumented tests of the payout flow against MockWebServer, including the `99999` and `88888` triggers, and of `EncryptedDevicePreferences`, which has no unit tests because it needs a real Android Keystore that the JVM doesn't have.
 
 ## What I left out and why
 
