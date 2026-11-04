@@ -54,8 +54,6 @@ The second command also runs the tests, and writes its report to `app/build/repo
 
 The app follows MVVM and the Repository pattern, in line with [Google's guide to app architecture](https://developer.android.com/topic/architecture), and adds the optional domain layer.
 
-The decisions below refer to two documents: the root `README.md` and `app/android/README.md`, called the requirements.
-
 ![architecture](figure/architecture.png)
 
 ### Architecture overview
@@ -71,10 +69,10 @@ Compose screens render a single `UiState` and send user events to their [ViewMod
 
 **Key decisions:**
 
-- **`MutableStateFlow` instead of the `stateIn(WhileSubscribed(5_000))` in the requirements:** these are one-shot loads with no upstream flow to share, and sequential functions launched in `viewModelScope` are simpler to read. The trade-offs: Home reloads on rotation, and a slow balance holds back an activity result that has already arrived. Balance and activity still load concurrently, so slow activity never delays the balance.
-- **The screen runs the biometric prompt, not the ViewModel:** the requirements inject `BiometricAuthenticator` into the ViewModel, but `BiometricPrompt` needs a `FragmentActivity`. So the ViewModel emits a one-shot event, the screen runs the prompt, and the result comes back as an action. The ViewModel stays testable with no hardware or Activity. The prompt is created with the screen, so its result survives a rotation.
+- **`MutableStateFlow` instead of `stateIn(WhileSubscribed(5_000))`:** these are one-shot loads with no upstream flow to share, and sequential functions launched in `viewModelScope` are simpler to read. The trade-offs: Home reloads on rotation, and a slow balance holds back an activity result that has already arrived. Balance and activity still load concurrently, so slow activity never delays the balance.
+- **The screen runs the biometric prompt, not the ViewModel:** a common pattern injects a `BiometricAuthenticator` into the ViewModel, but `BiometricPrompt` needs a `FragmentActivity`. So the ViewModel emits a one-shot event, the screen runs the prompt, and the result comes back as an action. The ViewModel stays testable with no hardware or Activity. The prompt is created with the screen, so its result survives a rotation.
 - **Form state in `SavedStateHandle`:** it survives process death and is cleared on success, so a completed payout can't come back filled in. The IBAN therefore sits in saved instance state until then.
-- **`FLAG_SECURE` per screen through `LifecycleResumeEffect`:** it's the Compose equivalent of the `onResume`/`onPause` in the requirements, needed because one Activity hosts every screen. It also covers the payout outcome screens, following the root README's "Payout screens". Android can block capture because the OS composites windows and honours the flag; iOS has no equivalent, so apps there can only detect a screenshot afterwards.
+- **`FLAG_SECURE` per screen through `LifecycleResumeEffect`:** it's the Compose equivalent of adding the flag in `onResume` and clearing it in `onPause`, needed because one Activity hosts every screen. It also covers the payout outcome screens, following the root README's "Payout screens". Android can block capture because the OS composites windows and honours the flag; iOS has no equivalent, so apps there can only detect a screenshot afterwards.
 - **Screenshot warning on API 34+ only:** that's where detection exists, and it still fires with the flag on, so the capture is black and the reminder shows. Older versions are still blocked, with no reminder.
 
 ### Domain layer (`:domain`)
@@ -83,7 +81,7 @@ A pure Kotlin module, with no Android dependency, so its rules run as plain JVM 
 
 **Key decisions:**
 
-- **Repository interfaces live here, not in the data layer as the requirements suggest:** this is Dependency Inversion, because `:data` depends on `:domain` and never the other way round. Gradle enforces it: `:domain` can't import Retrofit or Android.
+- **Repository interfaces live here, not in the data layer:** this is Dependency Inversion, because `:data` depends on `:domain` and never the other way round. Gradle enforces it: `:domain` can't import Retrofit or Android.
 - **`Money` is a `Long` in minor units:** `BigDecimal` is used for parsing and formatting, and `Double` or `Float` never are. Fraction digits come from `java.util.Currency`, so nothing hard-codes `100`.
 - **Biometric thresholds in major units, passed through the constructor:** the rule is "over", so exactly £1,000 skips the prompt. A currency with no threshold requires biometrics, which is the safe default.
 
@@ -98,8 +96,8 @@ Implements the interfaces from `:domain`:
 
 - **`Result<T>` with a sealed `DataError`, and no `runCatching`:** the UI handles each failure exhaustively, and `runCatching` around suspend calls would also swallow `CancellationException`.
 - **Device ID is a local UUID, not `GET /api/devices`:** this is what the requirements ask for, and the mock regenerates that endpoint's ID per process.
-- **Device ID generated at the first payout, not "on first launch" as the requirements say:** it avoids Keystore and disk work at startup, and the ID is only needed when a payout is sent. It stays stable across launches.
-- **`EncryptedSharedPreferences` despite its deprecation:** the requirements ask for it. The alternative would be a Keystore key with DataStore.
+- **Device ID generated at the first payout, not on first launch:** it avoids Keystore and disk work at startup, and the ID is only needed when a payout is sent. It stays stable across launches.
+- **`EncryptedSharedPreferences` despite its deprecation:** the device ID identifies the device that sends payouts, so it's kept encrypted with a Keystore-backed key. The alternative would be a Keystore key with DataStore.
 
 ### Design system (`:design-system`)
 
@@ -115,8 +113,7 @@ For more information, see the [guide to Android app modularization](https://deve
 
 ## Others decisions
 
-- **MockWebServer instead of asset fixtures:** the two READMEs disagree. The root README ships the server, and using it means real HTTP calls, real serialization and real 503 and 400 responses for the `99999` and `88888` triggers.
-- **No dependency injection framework:** the requirements allow plain constructor injection, and `AppContainer` is enough for this size. It's the only file in `:app` that imports `:data`.
+- **No dependency injection framework:** plain constructor injection through `AppContainer` is enough for this size. It's the only file in `:app` that imports `:data`.
 - **`annotation-experimental` 1.5.1:** a workaround for a known Android Studio false error on `@Serializable` classes (KTIJ-31549). The Gradle build never reported it.
 
 ## What you would improve or add with more time
