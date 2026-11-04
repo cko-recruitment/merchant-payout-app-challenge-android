@@ -22,7 +22,7 @@ import manoellribeiro.dev.domain.usecase.ValidateIbanUseCase
 class AppContainer(baseUrl: String, context: Context) {
 
     private val merchantRepository = DataLayerFactory.createMerchantRepository(baseUrl)
-    private val deviceIdentityRepository = DataLayerFactory.createDeviceIdentityRepository(context)
+    private val deviceIdentityRepository = DataLayerFactory.createDeviceIdentityRepository(context, baseUrl)
     private val connectivityService = DataLayerFactory.createConnectivityService(context)
 
     val homeViewModelFactory = viewModelFactory {

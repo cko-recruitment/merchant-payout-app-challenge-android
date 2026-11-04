@@ -20,27 +20,31 @@ import retrofit2.create
 /** The only entry point to this module. Implementations stay internal, so :app sees just the interfaces. */
 object DataLayerFactory {
 
-    fun createMerchantRepository(baseUrl: String): MerchantRepository {
-        val client = OkHttpClient.Builder()
-            // A payout POST has no idempotency key yet, so OkHttp must not silently resend it.
-            .retryOnConnectionFailure(false)
-            .build()
-        val api = Retrofit.Builder()
+    // One client for every API, so all requests share its connection pool and threads.
+    private val client = OkHttpClient.Builder()
+        // A payout POST has no idempotency key yet, so OkHttp must not silently resend it.
+        .retryOnConnectionFailure(false)
+        .build()
+
+    fun createMerchantRepository(baseUrl: String): MerchantRepository =
+        MerchantRepositoryImpl(createMerchantApi(baseUrl))
+
+    fun createConnectivityService(context: Context): ConnectivityService =
+        ConnectivityServiceImpl(context.getSystemService(ConnectivityManager::class.java))
+
+    fun createDeviceIdentityRepository(context: Context, baseUrl: String): DeviceIdentityRepository {
+        val applicationContext = context.applicationContext
+        return DeviceIdentityRepositoryImpl(
+            api = createMerchantApi(baseUrl),
+            preferencesProvider = { createEncryptedDevicePreferences(applicationContext) },
+        )
+    }
+
+    private fun createMerchantApi(baseUrl: String): MerchantApi =
+        Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
             .addConverterFactory(apiJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create<MerchantApi>()
-        return MerchantRepositoryImpl(api)
-    }
-
-    fun createConnectivityService(context: Context): ConnectivityService =
-        ConnectivityServiceImpl(context.getSystemService(ConnectivityManager::class.java))
-
-    fun createDeviceIdentityRepository(context: Context): DeviceIdentityRepository {
-        val applicationContext = context.applicationContext
-        return DeviceIdentityRepositoryImpl(
-            preferencesProvider = { createEncryptedDevicePreferences(applicationContext) },
-        )
-    }
 }
