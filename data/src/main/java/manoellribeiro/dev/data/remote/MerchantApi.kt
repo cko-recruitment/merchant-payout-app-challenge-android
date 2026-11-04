@@ -1,6 +1,7 @@
 package manoellribeiro.dev.data.remote
 
 import manoellribeiro.dev.data.remote.model.RemoteActivityPage
+import manoellribeiro.dev.data.remote.model.RemoteDevice
 import manoellribeiro.dev.data.remote.model.RemoteMerchantResponse
 import manoellribeiro.dev.data.remote.model.RemotePayoutRequest
 import manoellribeiro.dev.data.remote.model.RemotePayoutResponse
@@ -22,4 +23,7 @@ internal interface MerchantApi {
 
     @POST("api/payouts")
     suspend fun createPayout(@Body request: RemotePayoutRequest): RemotePayoutResponse
+
+    @GET("api/devices")
+    suspend fun getDevice(): RemoteDevice
 }

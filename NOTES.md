@@ -95,8 +95,7 @@ Implements the interfaces from `:domain`:
 **Key decisions:**
 
 - **`Result<T>` with a sealed `DataError`, and no `runCatching`:** the UI handles each failure exhaustively, and `runCatching` around suspend calls would also swallow `CancellationException`.
-- **Device ID is a local UUID, not `GET /api/devices`:** this is what the requirements ask for, and the mock regenerates that endpoint's ID per process.
-- **Device ID generated at the first payout, not on first launch:** it avoids Keystore and disk work at startup, and the ID is only needed when a payout is sent. It stays stable across launches.
+- **Device ID from `GET /api/devices`, fetched at the first payout:** the server issues it, and the app saves it in `EncryptedSharedPreferences` and reuses it, so it stays stable across launches. Fetching it then, not on first launch, keeps network, Keystore and disk work out of startup, since the ID is only needed when a payout is sent.
 - **`EncryptedSharedPreferences` despite its deprecation:** the device ID identifies the device that sends payouts, so it's kept encrypted with a Keystore-backed key. The alternative would be a Keystore key with DataStore.
 
 ### Design system (`:design-system`)
