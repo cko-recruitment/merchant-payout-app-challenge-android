@@ -24,3 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "AndroidInterview"
 include(":app")
+include(":domain")
+include(":data")
+include(":design-system")

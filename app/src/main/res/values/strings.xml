@@ -1,3 +1,73 @@
 <resources>
     <string name="app_name">AndroidInterview</string>
+
+    <string name="tab_home">Home</string>
+    <string name="tab_payouts">Payouts</string>
+
+    <string name="home_title">Business Account</string>
+    <string name="home_balance_title">Account Balance</string>
+    <string name="home_balance_available">Available</string>
+    <string name="home_balance_pending">Pending</string>
+    <string name="home_error">We couldn\'t load your account.</string>
+    <string name="home_balance_error">We couldn\'t load your balance.</string>
+    <string name="home_activity_title">Recent Activity</string>
+    <string name="home_activity_empty">No recent activity.</string>
+    <string name="home_activity_error">We couldn\'t load your recent activity.</string>
+    <string name="home_show_more">Show More</string>
+    <string name="home_retry">Try Again</string>
+    <string name="home_loading">Loading…</string>
+
+    <string name="transactions_title">Recent Activity</string>
+    <string name="transactions_done">Done</string>
+    <string name="transactions_today">Today</string>
+    <string name="transactions_yesterday">Yesterday</string>
+    <string name="transactions_empty">No transactions yet.</string>
+    <string name="transactions_error">We couldn\'t load your transactions.</string>
+    <string name="transactions_next_page_error">We couldn\'t load more transactions.</string>
+    <string name="transactions_loading_more">Loading more…</string>
+
+    <string name="activity_type_payout">Payout</string>
+    <string name="activity_type_deposit">Deposit</string>
+    <string name="activity_type_refund">Refund</string>
+    <string name="activity_type_fee">Fee</string>
+    <string name="activity_type_unknown">Transaction</string>
+    <string name="activity_status_completed">Completed</string>
+    <string name="activity_status_pending">Pending</string>
+    <string name="activity_status_processing">Processing</string>
+    <string name="activity_status_failed">Failed</string>
+    <string name="activity_status_unknown">Unknown</string>
+
+    <string name="payouts_title">Send Payout</string>
+    <string name="payout_amount_label">Amount</string>
+    <string name="payout_amount_placeholder">0.00</string>
+    <string name="payout_amount_error">Enter a valid amount, like 400.50.</string>
+    <string name="payout_currency_label">Currency</string>
+    <string name="payout_iban_label">IBAN</string>
+    <string name="payout_iban_placeholder" translatable="false">GB29NWBK60161331926819</string>
+    <string name="payout_iban_helper">Enter the destination bank account IBAN</string>
+    <string name="payout_iban_error">Enter a valid IBAN, starting with two capital letters.</string>
+    <string name="payout_confirm">Confirm</string>
+    <string name="payout_cancel">Cancel</string>
+    <string name="payout_submitting">Sending…</string>
+    <string name="payout_no_internet">No internet connection</string>
+    <string name="payout_confirm_title">Confirm Payout</string>
+    <string name="payout_summary_amount">Amount:</string>
+    <string name="payout_summary_currency">Currency:</string>
+    <string name="payout_summary_iban">IBAN:</string>
+    <string name="payout_outcome_title">Payout</string>
+    <string name="payout_success_title">Payout Completed</string>
+    <string name="payout_success_message">Your payout of %1$s has been processed successfully.</string>
+    <string name="payout_create_another">Create Another Payout</string>
+    <string name="payout_failure_title">Unable to Process Payout</string>
+    <string name="payout_error_service_unavailable">Service temporarily unavailable. Please try again later.</string>
+    <string name="payout_error_insufficient_funds">Insufficient funds.</string>
+    <string name="payout_error_unknown_outcome">We lost the connection and can\'t tell if your payout went through. Check your recent activity before trying again.</string>
+    <string name="payout_biometric_title">Biometric Authentication</string>
+    <string name="payout_biometric_subtitle">Authenticate to complete the payout</string>
+    <string name="payout_error_biometric_cancelled">Biometric authentication was cancelled.</string>
+    <string name="payout_error_biometric_unavailable">Biometric authentication isn\'t available. Check it\'s set up in your device settings, then try again.</string>
+    <string name="payout_security_reminder_title">Security Reminder</string>
+    <string name="payout_security_reminder_message">Please keep your financial data private. Screenshots may contain sensitive information.</string>
+    <string name="payout_security_reminder_ok">OK</string>
+    <string name="payout_error_unexpected">Something went wrong. Please try again.</string>
 </resources>
